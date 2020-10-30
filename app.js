@@ -6,7 +6,7 @@ const app = express();
 var items=["Buy food"];
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(express.static("public"));
 
 
 
