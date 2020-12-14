@@ -1,6 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-
+const mongoose= require("mongoose");
 
 const app = express();
 var items = ["Buy food"];
@@ -9,11 +9,11 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
+mongoose.connect('mongodb://localhost:27017/todolistDB', { useUnifiedTopology: true, useNewUrlParser: true });
 
 
 app.get("/", function (req, res) {
     var today = new Date();
-    var currDay = today.getDay();
     var options = {
         weekday: "long",
         day: "numeric",
@@ -47,7 +47,7 @@ app.post("/work", function (req, res) {
     workItems.push(item);
     res.redirect("/work");
 });
-app.listen(3000, function (req, res) {
+app.listen(3000, function () {
 
     console.log("server is running on port 3000");
 });
