@@ -1,6 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const mongoose= require("mongoose");
+const mongoose = require("mongoose");
 
 const app = express();
 var items = ["Buy food"];
@@ -10,6 +10,27 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 mongoose.connect('mongodb://localhost:27017/todolistDB', { useUnifiedTopology: true, useNewUrlParser: true });
+//schema
+
+const itemsSchema = new mongoose.Schema({
+    name: String
+});
+
+//model
+const Item = mongoose.model("Item", itemsSchema);
+
+const item1 = new Item({
+    name: "Welcome to your todolist!"
+});
+const item2 = new Item({
+    name: "Hit the + button to add a new item"
+});
+const item3 = new Item({
+    name: "<-- Hit this to delte an item"
+});
+
+// const defaultitems=[item1,item2,item3];
+
 
 
 app.get("/", function (req, res) {
@@ -20,9 +41,25 @@ app.get("/", function (req, res) {
         month: "long"
     };
     var day = today.toLocaleDateString("en-US", options);
+    Item.find({}, function (err, foundItems) {
+        if (foundItems.length == 0) {
+            Item.insertMany([item1, item2, item3], function (err) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    console.log("Sucessfully save items to DB");
+                }
+            });
+            res.redirect("/"); // go back to top 
+        }else{
+            res.render("list", { listTitle: day, newListItem: foundItems });
+        }
+       
+
+    });
 
 
-    res.render("list", { listTitle: day, newListItem: items }); // using EJS to pass day to list
+
 
 
 });
