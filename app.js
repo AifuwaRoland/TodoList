@@ -95,25 +95,36 @@ app.post("/", function (req, res) {
         item.save();
         res.redirect("/");
     } else {
-        List.findOne({  name: listName}, function(err, foundList) {
-                foundList.items.push(item);
-                foundList.save();
-                res.redirect("/" + listName);
-            });
+        List.findOne({ name: listName }, function (err, foundList) {
+            foundList.items.push(item);
+            foundList.save();
+            res.redirect("/" + listName);
+        });
     }
 
 
 });
 app.post("/delete", function (req, res) {
     const checklItemId = req.body.checkbox;
-    Item.findByIdAndRemove(checklItemId, function (err) {
-        if (err) {
-            coinsole.print(err)
-        } else {
-            console.log("sucessfully deleted item from DB");
-            res.redirect("/");
-        }
-    })
+    const listName = req.body.listName;
+
+    if (listName == "Today") {
+        Item.findByIdAndRemove(checklItemId, function (err) {
+            if (err) {
+                coinsole.print(err)
+            } else {
+                console.log("sucessfully deleted item from DB");
+                res.redirect("/");
+            }
+        });
+    } else {
+        List.findOneAndUpdate({ name: listName }, { $pull: { items: { _id: checklItemId } } }, function (err, foundList) { //delete item from list
+            if (!err) {
+                res.redirect("/" + listName);
+            }
+        });
+    }
+
 
 });
 
