@@ -29,7 +29,12 @@ const item3 = new Item({
     name: "<-- Hit this to delte an item"
 });
 
-// const defaultitems=[item1,item2,item3];
+const defaultitems = [item1, item2, item3];
+const listSchema = {
+    name: String,
+    items: [itemsSchema]
+};
+const List = mongoose.model("List", listSchema);
 
 
 
@@ -54,11 +59,27 @@ app.get("/", function (req, res) {
         } else {
             res.render("list", { listTitle: day, newListItem: foundItems });
         }
-
-
     });
 
+    app.get("/:customListName", function (req, res) { // create dynamic route name
+        const customListName = req.params.customListName;
+        List.findOne({ name: customListName }, function (err, foundList) {
+            if (!err) {
+                if (!foundList) {
 
+                    const list = new List({
+                        name: customListName,
+                        items: defaultitems
+                    });
+                    list.save();
+                    res.redirect("/"+ customListName);
+                } else {
+
+                    res.render("list", { listTitle: foundList.name, newListItem: foundList.items });
+                }
+            }
+        });
+    });
 
 
 
@@ -69,14 +90,7 @@ app.post("/", function (req, res) {
     });
     item.save();
     res.redirect("/");
-    // if (req.body.list == "Work") {
-    //     workItems.push(item);
-    //     res.redirect("/work");
-    // } else {
-    //     items.push(item);
-    //     res.redirect("/");
-
-    // }
+    
 });
 app.post("/delete", function (req, res) {
     const checklItemId = req.body.checkbox;
