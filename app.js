@@ -51,10 +51,10 @@ app.get("/", function (req, res) {
                 }
             });
             res.redirect("/"); // go back to top 
-        }else{
+        } else {
             res.render("list", { listTitle: day, newListItem: foundItems });
         }
-       
+
 
     });
 
@@ -64,9 +64,9 @@ app.get("/", function (req, res) {
 
 });
 app.post("/", function (req, res) {
-    const item=new Item({
-        name:req.body.newItem
-      });
+    const item = new Item({
+        name: req.body.newItem
+    });
     item.save();
     res.redirect("/");
     // if (req.body.list == "Work") {
@@ -77,9 +77,21 @@ app.post("/", function (req, res) {
     //     res.redirect("/");
 
     // }
-
+});
+app.post("/delete", function (req, res) {
+    const checklItemId = req.body.checkbox;
+    Item.findByIdAndRemove(checklItemId, function (err) {
+        if (err) {
+            coinsole.print(err)
+        } else {
+            console.log("sucessfully deleted item from DB");
+            res.redirect("/");
+        }
+    })
 
 });
+
+
 app.get("/work", function (req, res) {
     res.render("list", { listTitle: "Work List", newListItem: workItems });
 });
