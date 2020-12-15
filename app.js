@@ -57,7 +57,7 @@ app.get("/", function (req, res) {
             });
             res.redirect("/"); // go back to top 
         } else {
-            res.render("list", { listTitle: day, newListItem: foundItems });
+            res.render("list", { listTitle: "Today", newListItem: foundItems });
         }
     });
 
@@ -72,7 +72,7 @@ app.get("/", function (req, res) {
                         items: defaultitems
                     });
                     list.save();
-                    res.redirect("/"+ customListName);
+                    res.redirect("/" + customListName);
                 } else {
 
                     res.render("list", { listTitle: foundList.name, newListItem: foundList.items });
@@ -85,12 +85,24 @@ app.get("/", function (req, res) {
 
 });
 app.post("/", function (req, res) {
+    const itemName = req.body.newItem;
+    const listName = req.body.list;
     const item = new Item({
-        name: req.body.newItem
+        name: itemName
     });
-    item.save();
-    res.redirect("/");
-    
+
+    if (listName == "Today") {
+        item.save();
+        res.redirect("/");
+    } else {
+        List.findOne({  name: listName}, function(err, foundList) {
+                foundList.items.push(item);
+                foundList.save();
+                res.redirect("/" + listName);
+            });
+    }
+
+
 });
 app.post("/delete", function (req, res) {
     const checklItemId = req.body.checkbox;
