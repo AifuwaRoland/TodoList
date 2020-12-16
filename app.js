@@ -139,7 +139,12 @@ app.post("/work", function (req, res) {
     workItems.push(item);
     res.redirect("/work");
 });
-app.listen(3000, function () {
+let port= process.env.PORT;
+if(port== null || port== ""){
+    port=3000;
+}
+app.listen(port);
+app.listen(port, function () {
 
-    console.log("server is running on port 3000");
+    console.log("Server has started Sucessfully");
 });
